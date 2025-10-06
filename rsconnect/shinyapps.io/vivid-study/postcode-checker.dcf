@@ -1,0 +1,13 @@
+name: postcode-checker
+title: postcode-checker
+username: vivid-study
+account: vivid-study
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 15639852
+bundleId: 10999702
+url: https://vivid-study.shinyapps.io/postcode-checker/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: README.md

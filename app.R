@@ -20,6 +20,13 @@ ui <- page_fluid(
         max-width: 450px;
       }
 
+      .map-legend {
+        margin-bottom: 1rem;
+        background-color: rgba(82, 12, 137, 0.6);
+        padding: 0.3rem 1rem;
+        font-weight: bold;
+      }
+
       #submit {
         margin-bottom: 1rem;
       }"
@@ -86,6 +93,9 @@ $(function() {
       inputId = "submit",
       label = "Submit"),
     htmlOutput("outcome"),
+    tagAppendAttributes(
+      div("In the following map, the purple overlay indicates areas in the study."),
+      class = "map-legend"),
     leafletOutput("map",
                   height = 600),
     p("This app uses the Gridlink NHS Postcode Directory and digital boundary",
@@ -117,109 +127,116 @@ server <- function(input, output, session) {
       setView(-1.4649, 52.5619, zoom = 6)
   })
 
-  observeEvent(
-    eventExpr = input[["submit"]],
-    handlerExpr = {
-      output$outcome <- NULL
-      clean_postcode <- gsub("\\s+", "", toupper(input$postcode))
-      clean_postcode_len <- nchar(clean_postcode)
-      if(!grepl("^[A-Z]{1,2}[0-9][A-Z0-9]?[0-9][A-Z]{2}$", clean_postcode)) {
+  # See pattern @ https://shiny.posit.co/r/reference/shiny/1.2.0/observeevent.html
+  #   clean_postcode <- eventReactive(input$submit,{
+  #     input$submit
+  #   },
+  #   ignoreInit = TRUE)
+
+  observeEvent(input$submit, {
+    output$outcome <- NULL
+    clean_postcode <- gsub("\\s+", "", toupper(input$postcode))
+    clean_postcode_len <- nchar(clean_postcode)
+    if(!grepl("^[A-Z]{1,2}[0-9][A-Z0-9]?[0-9][A-Z]{2}$", clean_postcode)) {
+      showNotification(
+        ui = paste0("The text submitted (", clean_postcode, ") is not a valid postcode.\nPlease check and try again."),
+        id = "note_postcode_invalid",
+        type = "warning",
+        duration = NULL)
+    } else {
+      pc_district <- substr(clean_postcode,
+                            1,
+                            clean_postcode_len - 3)
+      pc_output <- paste(pc_district,
+                         substr(clean_postcode,
+                                clean_postcode_len - 2,
+                                clean_postcode_len))
+
+      pc_details <- postcode_catchment_area_lookup[postcode == pc_output]
+      pc_district_details <- postcode_district_catchment_area_lookup[postcode_district == pc_district]
+
+      input_error <- FALSE
+
+      if(nrow(pc_details) == 0 & nrow(pc_district_details) == 0) {
         showNotification(
-          ui = paste0("The text submitted (", clean_postcode, ") is not a valid postcode.\nPlease check and try again."),
+          ui = "We can't find the submitted postcode.\nPlease check and try again or use the interactive map.",
           id = "note_postcode_invalid",
           type = "warning",
           duration = NULL)
+
+        input_error <- TRUE
+      } else if(nrow(pc_details) == 0 & nrow(pc_district_details) == 1) {
+        if(!pc_district_details$in_catchment_area) {
+          result_catchment = FALSE
+          result_text = paste("The postcode",
+                              strong(pc_output),
+                              "is",
+                              strong("not"),
+                              "in the study area.")
+        } else {
+          result_catchment = as.logical(NA)
+          result_text = paste0("We can't find the precise postcode submitted: ", pc_output, "<br />",
+                               "The submitted postcode district (",
+                               strong(pc_district),
+                               ") contains some postcodes included in the study.<br />",
+                               "Please check the map to be sure.")
+        }
+
+        if(is.na(pc_district_details$longitude)) {
+          result_coords <- NA
+        } else {
+          result_coords <- c(pc_district_details$longitude,
+                             pc_district_details$latitude,
+                             12)
+        }
       } else {
-        pc_district <- substr(clean_postcode,
-                              1,
-                              clean_postcode_len - 3)
-        pc_output <- paste(pc_district,
-                           substr(clean_postcode,
-                                  clean_postcode_len - 2,
-                                  clean_postcode_len))
+        if(!pc_details$in_catchment_area) {
+          result_catchment = FALSE
+          result_text = paste("The postcode ",
+                              strong(pc_output),
+                              "is",
+                              strong("not"),
+                              "in the study area.")
+        } else {
+          result_catchment = TRUE
+          result_text = paste("The postcode",
+                              strong(pc_output),
+                              "is in the study area.")
+        }
 
-        pc_details <- postcode_catchment_area_lookup[postcode == pc_output]
-        pc_district_details <- postcode_district_catchment_area_lookup[postcode_district == pc_district]
-
-        input_error <- FALSE
-
-        if(nrow(pc_details) == 0 & nrow(pc_district_details) == 0) {
-          showNotification(
-            ui = "We can't find the submitted postcode.\nPlease check and try again or use the interactive map.",
-            id = "note_postcode_invalid",
-            type = "warning",
-            duration = NULL)
-
-          input_error <- TRUE
-        } else if(nrow(pc_details) == 0 & nrow(pc_district_details) == 1) {
-          if(!pc_district_details$in_catchment_area) {
-            result_catchment = FALSE
-            result_text = paste("The postcode",
-                                 strong(pc_output),
-                                 "is",
-                                 strong("not"),
-                                 "in the study area.")
-          } else {
-            result_catchment = as.logical(NA)
-            result_text = paste0("We can't find the precise postcode submitted: ", pc_output, "<br />",
-                                "The submitted postcode district (",
-                                strong(pc_district),
-                                ") contains some postcodes included in the study.<br />",
-                                "Please check the map to be sure.")
-          }
-
+        if(!is.na(pc_details$longitude)) {
+          result_coords <- c(pc_details$longitude,
+                             pc_details$latitude,
+                             16)
+        } else {
           if(is.na(pc_district_details$longitude)) {
             result_coords <- NA
           } else {
             result_coords <- c(pc_district_details$longitude,
                                pc_district_details$latitude,
-                               13)
-          }
-        } else {
-          if(!pc_details$in_catchment_area) {
-            result_catchment = FALSE
-            result_text = paste("The postcode ",
-                                 strong(pc_output),
-                                 "is",
-                                 strong("not"),
-                                 "in the study area.")
-          } else {
-            result_catchment = TRUE
-            result_text = paste("The postcode",
-                                 strong(pc_output),
-                                 "is in the study area.")
-          }
-
-          if(!is.na(pc_details$longitude)) {
-            result_coords <- c(pc_details$longitude,
-                               pc_details$latitude,
-                               16)
-          } else {
-            if(is.na(pc_district_details$longitude)) {
-              result_coords <- NA
-            } else {
-              result_coords <- c(pc_district_details$longitude,
-                                 pc_district_details$latitude,
-                                 13)
-            }
-          }
-        }
-
-        updateTextInput(session, "postcode", value = pc_output)
-        if(!input_error) {
-          removeNotification("note_postcode_invalid")
-
-          output$outcome <- renderText(paste0("<div class='alert alert-info' role='alert'>",
-                                              result_text,
-                                              "</div>"))
-
-          if(!any(is.na(result_coords))) {
-            leafletProxy("map", session) |>
-              flyTo(lng = result_coords[1], lat = result_coords[2], zoom = as.integer(result_coords[3]))
+                               12)
           }
         }
       }
-    })
+
+      updateTextInput(session, "postcode", value = pc_output)
+      if(!input_error) {
+        removeNotification("note_postcode_invalid")
+
+        output$outcome <- renderText(paste0("<div class='alert alert-info' role='alert'>",
+                                            result_text,
+                                            "</div>"))
+
+        if(!any(is.na(result_coords))) {
+          leafletProxy("map", session) |>
+            flyTo(lng = result_coords[1], lat = result_coords[2], zoom = as.integer(result_coords[3]))
+        } else {
+          leafletProxy("map", session) |>
+            setView(lng = -1.4649, lat = 52.5619, zoom = 6)
+        }
+      }
+    }
+  })
 }
 
 # Run the application
