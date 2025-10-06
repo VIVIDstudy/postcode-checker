@@ -87,7 +87,16 @@ $(function() {
       label = "Submit"),
     htmlOutput("outcome"),
     leafletOutput("map",
-                  height = 600)
+                  height = 600),
+    p("This app uses the Gridlink NHS Postcode Directory and digital boundary",
+      "data from the Office for National Statistics licensed under the Open",
+      "Government Licence:"
+    ),
+    tags$ul(
+      tags$li("Contains Ordnance Survey data © Crown copyright and database right 2025"),
+      tags$li("Contains Royal Mail data © Royal Mail copyright and database right 2025"),
+      tags$li("Source: Office for National Statistics licensed under the Open Government Licence v.3.0")
+    )
   )
 )
 
@@ -149,7 +158,7 @@ server <- function(input, output, session) {
                                  strong(pc_output),
                                  "is",
                                  strong("not"),
-                                 "in a study area.")
+                                 "in the study area.")
           } else {
             result_catchment = as.logical(NA)
             result_text = paste0("We can't find the precise postcode submitted: ", pc_output, "<br />",
@@ -173,12 +182,12 @@ server <- function(input, output, session) {
                                  strong(pc_output),
                                  "is",
                                  strong("not"),
-                                 "in a study area.")
+                                 "in the study area.")
           } else {
             result_catchment = TRUE
             result_text = paste("The postcode",
                                  strong(pc_output),
-                                 "is in a study area.")
+                                 "is in the study area.")
           }
 
           if(!is.na(pc_details$longitude)) {
