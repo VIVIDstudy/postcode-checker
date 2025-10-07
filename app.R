@@ -27,6 +27,10 @@ ui <- page_fluid(
         font-weight: bold;
       }
 
+      .font-small {
+        font-size: x-small;
+      }
+
       #submit {
         margin-bottom: 1rem;
       }"
@@ -54,22 +58,23 @@ $(function() {
 
   verticalLayout(
     p("The University of Sheffield is running the VIVID study to",
-      "investigate how different respiratory viruses affect different",
-      "groups of people with and without different clinical",
+      "investigate how certain respiratory viruses affect different",
+      "groups of people with and without a variety of clinical",
       "vulnerabilities. To do this, we will use data collected in the",
       "course of routine patient care. You can find out more about the",
       "study at:",
-      a("https://www.vivid-study.co.uk",
+      a("www.vivid-study.co.uk",
         href="https://www.vivid-study.co.uk",
         target="_blank")),
     p("The research team will only have access to de-identified data,",
-      "so we won’t know whose records we’re looking at. However, our data",
-      "providers will process confidential patient information on our",
-      "behalf."),
+      "so we won’t know whose records we’re looking at. However, before we",
+      "receive the de-identified, our data providers (NHS England and the",
+      "UK Health Security Agency) will process confidential patient",
+      "information on our behalf."),
     p(strong("Your records may be included in the study if you were",
              "registered with the NHS as living in some areas of",
-             "England, indicated on the map below, at any time between 1st April 2021",
-             "and 31st March 2026.")),
+             "England, indicated on the map below, at any time between",
+             "1st April 2021 and 31st March 2026.")),
     p("If you have registered a NHS National Data Opt Out, your records",
       "will not be included in the data made available for the VIVID study."),
     p("Otherwise, you can check to see if your records might be included by",
@@ -78,7 +83,7 @@ $(function() {
     p("If you think your records might be included and you would like to opt",
       "out from your records being used in the VIVID study, you can find",
       "details of how to opt out on the study website:",
-      a("https://www.vivid-study.co.uk",
+      a("www.vivid-study.co.uk",
         href="https://www.vivid-study.co.uk",
         target="_blank")),
 
@@ -94,19 +99,25 @@ $(function() {
       label = "Submit"),
     htmlOutput("outcome"),
     tagAppendAttributes(
-      div("In the following map, the purple overlay indicates areas in the study."),
+      div("In the map, the purple overlay indicates areas in the study."),
       class = "map-legend"),
     leafletOutput("map",
                   height = 600),
-    p("This app uses the Gridlink NHS Postcode Directory and digital boundary",
-      "data from the Office for National Statistics licensed under the Open",
-      "Government Licence:"
-    ),
-    tags$ul(
-      tags$li("Contains Ordnance Survey data © Crown copyright and database right 2025"),
-      tags$li("Contains Royal Mail data © Royal Mail copyright and database right 2025"),
-      tags$li("Source: Office for National Statistics licensed under the Open Government Licence v.3.0")
-    )
+    p("This app does not store any user data, nor does it use any",
+      "non-essential cookies."),
+    tagAppendAttributes(
+      p("This app uses the Gridlink NHS Postcode Directory and digital boundary",
+        "data from the Office for National Statistics licensed under the Open",
+        "Government Licence:"
+      ),
+      class = "font-small"),
+    tagAppendAttributes(
+      tags$ul(
+        tags$li("Contains Ordnance Survey data © Crown copyright and database right 2025"),
+        tags$li("Contains Royal Mail data © Royal Mail copyright and database right 2025"),
+        tags$li("Source: Office for National Statistics licensed under the Open Government Licence v.3.0")
+      ),
+      class = "font-small")
   )
 )
 
@@ -124,7 +135,7 @@ server <- function(input, output, session) {
                   stroke = FALSE,
                   fillOpacity = 0.6,
                   fillColor = "#520c89") |>
-      setView(-1.4649, 52.5619, zoom = 6)
+      setView(lng = -1.4649, lat = 52.5619, zoom = 6)
   })
 
   # See pattern @ https://shiny.posit.co/r/reference/shiny/1.2.0/observeevent.html
@@ -139,10 +150,9 @@ server <- function(input, output, session) {
     clean_postcode_len <- nchar(clean_postcode)
     if(!grepl("^[A-Z]{1,2}[0-9][A-Z0-9]?[0-9][A-Z]{2}$", clean_postcode)) {
       showNotification(
-        ui = paste0("The text submitted (", clean_postcode, ") is not a valid postcode.\nPlease check and try again."),
+        ui = paste0("The entered text is not a valid postcode.\nPlease check and try again."),
         id = "note_postcode_invalid",
-        type = "warning",
-        duration = NULL)
+        type = "warning")
     } else {
       pc_district <- substr(clean_postcode,
                             1,
