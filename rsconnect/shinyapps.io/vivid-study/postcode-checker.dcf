@@ -5,7 +5,7 @@ account: vivid-study
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 15639852
-bundleId: 11004151
+bundleId: 11004314
 url: https://vivid-study.shinyapps.io/postcode-checker/
 version: 1
 asMultiple: FALSE
