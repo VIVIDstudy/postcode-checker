@@ -73,7 +73,7 @@ $(function() {
     p(strong("Your records would only be included in the study if you were:")),
     tags$ul(
       tags$li(strong("registered with the NHS as living in some areas of England; or,")),
-      tags$li(strong("were admitted to a NHS hospital in any of these areas."))
+      tags$li(strong("admitted to a NHS hospital in any of these areas."))
     ),
     p(strong("And only if this was between 1st April 2021 and 31st March 2026.",
              "The areas included are indicated on the map below.")),
