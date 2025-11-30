@@ -73,7 +73,7 @@ $(function() {
     p(strong("Your records would only be included in the study if you were:")),
     tags$ul(
       tags$li(strong("registered with the NHS as living in some areas of England; or,")),
-      tags$li(strong("were admitted to a hospital in any of these areas."))
+      tags$li(strong("were admitted to a NHS hospital in any of these areas."))
     ),
     p(strong("And only if this was between 1st April 2021 and 31st March 2026.",
              "The areas included are indicated on the map below.")),
@@ -89,7 +89,7 @@ $(function() {
       "the study once these are decided."),
     p(strong("NOTE: We updated the areas we plan to include on the 29th November",
              "2025. We also modified the text above. This was to clarify that people",
-             "admitted to a hospital in an indicated area would also be included.",
+             "admitted to a NHS hospital in an indicated area would also be included.",
              "Even if they did not live in an indicated area.")),
       # "See the study website for details on opting out:",
       # a("www.vivid-study.co.uk",

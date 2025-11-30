@@ -5,7 +5,7 @@ account: vivid-study
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 15802079
-bundleId: 11250269
+bundleId: 11251863
 url: https://vivid-study.shinyapps.io/area-checker/
 version: 1
 asMultiple: FALSE
