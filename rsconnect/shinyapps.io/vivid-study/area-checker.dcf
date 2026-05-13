@@ -1,11 +1,11 @@
 name: area-checker
-title: vivid-area-checker
+title: area-checker
 username: vivid-study
 account: vivid-study
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 15802079
-bundleId: 11251880
+bundleId: 11990753
 url: https://vivid-study.shinyapps.io/area-checker/
 version: 1
 asMultiple: FALSE

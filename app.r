@@ -54,7 +54,7 @@ $(function() {
   ),
 
 
-  titlePanel("VIVID study area checker: planned areas"),
+  titlePanel("VIVID study area checker"),
 
   verticalLayout(
     p("The University of Sheffield is running the VIVID study. We aim to work",
@@ -84,17 +84,11 @@ $(function() {
       strong("NHS National Data Opt-Out", .noWS = "after"),
       ", your records will not be included in this study."),
     p("If you think your records might be included and you don't want",
-      "them to be used in the VIVID study, you will be able to opt out.",
-      "We will update this page with the confirmed areas included in",
-      "the study once these are decided."),
-    p(strong("NOTE: We updated the areas we plan to include on the 29th November",
-             "2025. We also modified the text above. This was to clarify that people",
-             "admitted to a NHS hospital in an indicated area would also be included.",
-             "Even if they did not live in an indicated area.")),
-      # "See the study website for details on opting out:",
-      # a("www.vivid-study.co.uk",
-      #   href="https://www.vivid-study.co.uk",
-      #   target="_blank")),
+      "them to be used in the VIVID study, you can opt out.",
+      "See the study website for details on opting out:",
+      a("www.vivid-study.co.uk",
+        href="https://www.vivid-study.co.uk",
+        target="_blank")),
 
     tagAppendAttributes(
       textInput("postcode",
@@ -112,6 +106,7 @@ $(function() {
       class = "map-legend"),
     leafletOutput("map",
                   height = 600),
+
     p("This app does not store any user data, nor does it use any",
       "non-essential cookies."),
     tagAppendAttributes(
@@ -122,11 +117,28 @@ $(function() {
       class = "font-small"),
     tagAppendAttributes(
       tags$ul(
-        tags$li("Contains Ordnance Survey data © Crown copyright and database right 2025"),
-        tags$li("Contains Royal Mail data © Royal Mail copyright and database right 2025"),
+        tags$li("Contains Ordnance Survey data © Crown copyright and database right 2026"),
+        tags$li("Contains Royal Mail data © Royal Mail copyright and database right 2026"),
         tags$li("Source: Office for National Statistics licensed under the Open Government Licence v.3.0")
       ),
-      class = "font-small")
+      class = "font-small"),
+
+    p(strong("Changes to this app:")),
+    tags$ul(
+      tags$li(strong("13 May 2026:"),
+              "We updated the areas we will include. This was due to",
+              "the release of updated data on which hospitals are attended by",
+              "people living in different areas. This was published by the",
+              a("Office for Health Improvement and Disparities",
+                href="https://www.gov.uk/government/statistics/nhs-acute-hospital-trust-catchment-populations-april-2026",
+                target="_blank",
+                .noWS = "after"),
+              "."),
+      tags$li(strong("29 November 2025:"),
+              "We updated the areas we planned to include.",
+              "We also changed some text. This was to clarify that people",
+              "admitted to a NHS hospital in an indicated area would also be",
+              "included. Even if they did not live in an indicated area."))
   )
 )
 
